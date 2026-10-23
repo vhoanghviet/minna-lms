@@ -44,6 +44,7 @@
     card.classList.remove('noanim');
     $('counter').textContent = (i + 1) + ' / ' + deck.length;
     $('bar').style.width = (i * 100 / deck.length) + '%';
+    speak();
   }
 
   function flip() { $('card').classList.toggle('flipped'); }
