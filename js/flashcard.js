@@ -5,13 +5,16 @@
   var preview = q.get('preview') === '1';
 
   var words, deck = [], i = 0, missed = [], knownSet = new Set(), gotYes = 0;
-  var lastSpaceTime = 0; // Lưu mốc thời gian để nhận diện nhấn Space 2 lần liên tiếp
+  var lastSpaceTime = 0;
 
-  function persist() { if (!preview) Minna.LS.set('minna:known:' + n, Array.from(knownSet)); }
+  function persist() { if (!preview && window.Minna && Minna.LS) Minna.LS.set('minna:known:' + n, Array.from(knownSet)); }
 
   function shuffleArr(a) {
     a = a.slice();
-    for (var k = a.length - 1; k > 0; k--) { var j = Math.floor(Math.random() * (k + 1)); var t = a[k]; a[k] = a[j]; a[j] = t; }
+    for (var k = a.length - 1; k > 0; k--) { 
+      var j = Math.floor(Math.random() * (k + 1)); 
+      var t = a[k]; a[k] = a[j]; a[j] = t; 
+    }
     return a;
   }
 
@@ -73,9 +76,11 @@
 
   function speak() {
     if (!window.speechSynthesis || !deck[i]) return;
+    window.speechSynthesis.cancel();
     var u = new SpeechSynthesisUtterance(deck[i].jp.replace(/[～~\[\]]/g, ''));
-    u.lang = 'ja-JP'; u.rate = 0.85;
-    speechSynthesis.cancel(); speechSynthesis.speak(u);
+    u.lang = 'ja-JP'; 
+    u.rate = 0.85;
+    window.speechSynthesis.speak(u);
   }
 
   Minna.loadLesson(n, preview).then(function (l) {
@@ -93,7 +98,15 @@
     $('restart').addEventListener('click', function () { start(); });
     $('again').addEventListener('click', function () { start(); });
     $('reviewMissed').addEventListener('click', function () { start(missed.slice()); });
-    $('dir').addEventListener('change', function () { if (deck.length && i < deck.length) setCard(); });
+    
+    function onDirChange() {
+      if (deck.length && i < deck.length) {
+        $('card').classList.remove('flipped');
+        setCard();
+      }
+    }
+
+    $('dir').addEventListener('change', onDirChange);
     $('shuffle').addEventListener('change', function () { start(); });
     $('onlyUnknown').addEventListener('change', function () { start(); });
 
@@ -103,7 +116,7 @@
       if (e.code === 'KeyL') {
         e.preventDefault();
         $('dir').value = $('dir').value === 'jp' ? 'vi' : 'jp';
-        if (deck.length && i < deck.length) setCard();
+        onDirChange();
         return;
       }
 
@@ -127,6 +140,7 @@
 
       // 3. Phím tắt: Ctrl để phát âm
       if (e.key === 'Control') {
+        e.preventDefault();
         speak();
         return;
       }
@@ -134,12 +148,18 @@
       // 4. Các phím điều hướng và lật thẻ
       if (e.code === 'Space') { 
         e.preventDefault(); 
+        // Bỏ focus thẻ card nếu có để tránh native click kích hoạt lần 2
+        if (document.activeElement === $('card')) {
+          $('card').blur();
+        }
         flip(); 
       }
       else if (e.key === 'ArrowLeft') {
+        e.preventDefault();
         mark(false);
       }
       else if (e.key === 'ArrowRight') {
+        e.preventDefault();
         mark(true);
       }
     });
