@@ -1,0 +1,42 @@
+/* Minna LMS – đề flashcard Bài 21 – 34 từ */
+window.MINNA_LESSONS = window.MINNA_LESSONS || {};
+window.MINNA_LESSONS[21] = {
+  lesson: 21,
+  title: "Bài 21",
+  words: [
+    {"jp": "おもいます", "vi": "nghĩ rằng"},
+    {"jp": "いいます", "vi": "nói"},
+    {"jp": "たります", "vi": "đủ"},
+    {"jp": "かちます", "vi": "thắng, chiến thắng"},
+    {"jp": "まけます", "vi": "thua"},
+    {"jp": "あります[おまつりが～]", "vi": "diễn ra, được tổ chức [lễ hội]"},
+    {"jp": "やくにたちます", "vi": "có ích, hữu dụng"},
+    {"jp": "むだな", "vi": "lãng phí, vô ích"},
+    {"jp": "ふべん[な]", "vi": "bất tiện"},
+    {"jp": "おなじ", "vi": "giống nhau"},
+    {"jp": "すごい", "vi": "ghê gớm, tuyệt vời"},
+    {"jp": "しゅしょう", "vi": "thủ tướng"},
+    {"jp": "だいとうりょう", "vi": "tổng thống"},
+    {"jp": "せいじ", "vi": "chính trị"},
+    {"jp": "ニュース", "vi": "tin tức thời sự"},
+    {"jp": "スピーチ", "vi": "bài diễn văn"},
+    {"jp": "しあい", "vi": "trận đấu, cuộc thi đấu"},
+    {"jp": "アルバイト", "vi": "việc làm thêm"},
+    {"jp": "いけん", "vi": "ý kiến"},
+    {"jp": "おはなし", "vi": "câu chuyện, nói chuyện"},
+    {"jp": "ユーモア", "vi": "sự hài hước"},
+    {"jp": "デザイン", "vi": "thiết kế"},
+    {"jp": "こうつう", "vi": "giao thông"},
+    {"jp": "ラッシュ", "vi": "giờ cao điểm"},
+    {"jp": "さいきん", "vi": "gần đây"},
+    {"jp": "たぶん", "vi": "có lẽ, chắc là"},
+    {"jp": "きっと", "vi": "chắc chắn, nhất định"},
+    {"jp": "ほんとうに", "vi": "thực sự"},
+    {"jp": "そんなに", "vi": "không đến mức như thế"},
+    {"jp": "～について", "vi": "về vấn đề ~"},
+    {"jp": "しかたがありません", "vi": "không còn cách nào khác"},
+    {"jp": "しばらくですね", "vi": "lâu ngày không gặp"},
+    {"jp": "～でものみませんか", "vi": "uống cái gì đó như ~ nhé?"},
+    {"jp": "もちろん", "vi": "tất nhiên rồi"}
+  ]
+};

@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Admin – Minna LMS</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header class="top">
+  <a class="brand" href="./">📚 Minna LMS</a>
+  <a class="link" href="./">← Trang học sinh</a>
+</header>
+<main class="wrap narrow">
+  <h1>Admin – Đăng đề flashcard</h1>
+
+  <details class="panel" id="cfgBox">
+    <summary><b>① Cài đặt GitHub</b> (làm 1 lần)</summary>
+    <div class="form">
+      <label>Owner (tài khoản GitHub) <input id="owner"></label>
+      <label>Repo <input id="repo" placeholder="minna-lms"></label>
+      <label>Branch <input id="branch" value="main"></label>
+      <label>Personal Access Token <input id="token" type="password" placeholder="github_pat_..."></label>
+      <p class="muted small">Token chỉ lưu trong trình duyệt này. Tạo Fine-grained token, chỉ chọn repo này, quyền <b>Contents: Read and write</b>.</p>
+      <button class="btn" id="saveCfg">Lưu cài đặt</button>
+    </div>
+  </details>
+
+  <section class="panel">
+    <b>② Dán source JS từ Gem</b>
+    <textarea id="code" rows="12" spellcheck="false" placeholder="window.MINNA_LESSONS = window.MINNA_LESSONS || {};&#10;window.MINNA_LESSONS[1] = { ... };"></textarea>
+    <div class="actions left">
+      <button class="btn" id="compile">⚙ Compile &amp; kiểm tra</button>
+    </div>
+    <div id="msg" class="msg"></div>
+  </section>
+
+  <section class="panel" id="resultBox" hidden>
+    <b>③ Kết quả</b>
+    <p id="info"></p>
+    <div class="actions left">
+      <button class="btn ghost" id="preview">👁 Xem thử (chỉ trên máy này)</button>
+      <button class="btn good" id="publish">🚀 Đăng lên GitHub</button>
+      <button class="btn ghost" id="download">⬇ Tải file .js</button>
+    </div>
+    <div class="tablewrap"><table id="tbl"></table></div>
+  </section>
+</main>
+<script src="js/app.js"></script>
+<script src="js/admin.js"></script>
+</body>
+</html>
