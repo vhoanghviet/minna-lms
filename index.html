@@ -3,19 +3,36 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#2b3a8f">
+<meta name="description" content="Luyện từ vựng tiếng Nhật N5 bằng flashcard theo từng bài Minna no Nihongo.">
 <title>Minna LMS – Luyện từ vựng N5</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 <header class="top">
-  <a class="brand" href="./">📚 Minna LMS</a>
+  <a class="brand" href="./" aria-label="Minna LMS – trang chủ">
+    <span class="logo" aria-hidden="true">学</span>
+    <span>Minna LMS</span>
+  </a>
   <a class="link" href="admin.html">Admin</a>
 </header>
+
 <main class="wrap">
-  <h1>Đề luyện flashcard N5</h1>
-  <p class="muted">Chọn một bài để bắt đầu. Bài chưa có đề sẽ bị mờ.</p>
-  <div id="grid" class="grid"></div>
+  <section class="hero">
+    <div>
+      <h1>Đề luyện flashcard N5</h1>
+      <p class="muted">Chọn một bài để bắt đầu. Bài chưa có đề sẽ bị mờ.</p>
+    </div>
+    <div class="stamp" aria-hidden="true">五</div>
+  </section>
+
+  <div id="grid" class="grid" aria-live="polite"></div>
+  <noscript><p class="muted center">Cần bật JavaScript để hiển thị danh sách bài học.</p></noscript>
 </main>
+
 <script src="js/app.js"></script>
 <script src="js/home.js"></script>
 </body>
