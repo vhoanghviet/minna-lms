@@ -5,6 +5,7 @@
   var preview = q.get('preview') === '1';
 
   var words, deck = [], i = 0, missed = [], knownSet = new Set(), gotYes = 0;
+  var lastSpaceTime = 0; // Lưu mốc thời gian để nhận diện nhấn Space 2 lần liên tiếp
 
   function persist() { if (!preview) Minna.LS.set('minna:known:' + n, Array.from(knownSet)); }
 
@@ -95,12 +96,54 @@
     $('dir').addEventListener('change', function () { if (deck.length && i < deck.length) setCard(); });
     $('shuffle').addEventListener('change', function () { start(); });
     $('onlyUnknown').addEventListener('change', function () { start(); });
+
+    // Xử lý toàn bộ các phím tắt
     document.addEventListener('keydown', function (e) {
+      // 1. Phím tắt: Ctrl + Shift + Tab để đổi hướng hiển thị (Tiếng Việt <-> Tiếng Nhật)
+      if (e.ctrlKey && e.shiftKey && (e.key === 'Tab' || e.code === 'Tab')) {
+        e.preventDefault();
+        $('dir').value = $('dir').value === 'jp' ? 'vi' : 'jp';
+        if (deck.length && i < deck.length) setCard();
+        return;
+      }
+
+      // 2. Phím tắt: Nhấn Space 2 lần liên tiếp sau khi hoàn thành bài để ôn từ chưa thuộc
+      if (e.code === 'Space' && $('study').hidden && !$('result').hidden) {
+        e.preventDefault();
+        var now = Date.now();
+        if (now - lastSpaceTime < 400) {
+          if (missed.length > 0) {
+            start(missed.slice());
+          }
+          lastSpaceTime = 0;
+        } else {
+          lastSpaceTime = now;
+        }
+        return;
+      }
+
+      // Các phím tắt tiếp theo chỉ hoạt động khi đang trong màn hình học
       if ($('study').hidden) return;
-      if (e.code === 'Space') { e.preventDefault(); flip(); }
-      else if (e.key === 'ArrowLeft') mark(false);
-      else if (e.key === 'ArrowRight') mark(true);
+
+      // 3. Phím tắt: Ctrl để phát âm
+      if (e.key === 'Control') {
+        speak();
+        return;
+      }
+
+      // 4. Các phím điều hướng và lật thẻ
+      if (e.code === 'Space') { 
+        e.preventDefault(); 
+        flip(); 
+      }
+      else if (e.key === 'ArrowLeft') {
+        mark(false);
+      }
+      else if (e.key === 'ArrowRight') {
+        mark(true);
+      }
     });
+
     start();
   });
 })();
