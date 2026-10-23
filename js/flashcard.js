@@ -99,8 +99,8 @@
 
     // Xử lý toàn bộ các phím tắt
     document.addEventListener('keydown', function (e) {
-      // 1. Phím tắt: Ctrl + Shift + Tab để đổi hướng hiển thị (Tiếng Việt <-> Tiếng Nhật)
-      if (e.ctrlKey && e.shiftKey && (e.key === 'Tab' || e.code === 'Tab')) {
+      // 1. Phím tắt: Ctrl + Tab để đổi hướng hiển thị (Tiếng Việt <-> Tiếng Nhật)
+      if (e.ctrlKey && (e.key === 'Tab' || e.code === 'Tab')) {
         e.preventDefault();
         $('dir').value = $('dir').value === 'jp' ? 'vi' : 'jp';
         if (deck.length && i < deck.length) setCard();
