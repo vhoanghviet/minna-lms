@@ -10,20 +10,26 @@
     del: function (k) { try { localStorage.removeItem(k); } catch (e) {} }
   };
 
-  // preview=true: đọc bản xem thử admin lưu trong localStorage
   function loadLesson(n, preview) {
     return new Promise(function (res) {
       if (preview) return res(LS.get('minna:preview:' + n, null));
       if (W.MINNA_LESSONS[n]) return res(W.MINNA_LESSONS[n]);
+
       var s = document.createElement('script');
       s.src = 'data/lessons/bai-' + n + '.js?v=' + Date.now();
-      s.onload = function () { res(W.MINNA_LESSONS[n] || null); };
-      s.onerror = function () { res(null); };
+      s.onload = function () { 
+        s.remove();
+        res(W.MINNA_LESSONS[n] || null); 
+      };
+      s.onerror = function () { 
+        s.remove();
+        res(null); 
+      };
       document.head.appendChild(s);
     });
   }
 
-  function wordKey(w) { return w.jp + '|' + w.vi; }
+  function wordKey(w) { return (w.jp || '') + '|' + (w.vi || ''); }
 
   W.Minna = { TOTAL: TOTAL, LS: LS, loadLesson: loadLesson, wordKey: wordKey };
 })();
