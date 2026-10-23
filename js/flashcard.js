@@ -152,6 +152,7 @@
         if (document.activeElement === $('card')) {
           $('card').blur();
         }
+        speak();
         flip(); 
       }
       else if (e.key === 'ArrowLeft') {
