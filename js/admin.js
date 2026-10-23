@@ -7,23 +7,36 @@
   var host = location.hostname, parts = location.pathname.split('/').filter(Boolean);
   if (!cfg.owner && /\.github\.io$/.test(host)) cfg.owner = host.split('.')[0];
   if (!cfg.repo && /\.github\.io$/.test(host) && parts[0] && !/\.html$/.test(parts[0])) cfg.repo = parts[0];
-  ['owner', 'repo', 'branch', 'token'].forEach(function (k) { if (cfg[k]) $(k).value = cfg[k]; });
-  if (!cfg.token) $('cfgBox').open = true;
+  ['owner', 'repo', 'branch', 'token'].forEach(function (k) { if (cfg[k] && $(k)) $(k).value = cfg[k]; });
+  if (!cfg.token && $('cfgBox')) $('cfgBox').open = true;
 
-  $('saveCfg').onclick = function () {
-    var c = {};
-    ['owner', 'repo', 'branch', 'token'].forEach(function (k) { c[k] = $(k).value.trim(); });
-    Minna.LS.set('minna:cfg', c);
-    say('Đã lưu cài đặt.', 'ok');
-  };
+  if ($('saveCfg')) {
+    $('saveCfg').onclick = function () {
+      var c = {};
+      ['owner', 'repo', 'branch', 'token'].forEach(function (k) { 
+        if ($(k)) c[k] = $(k).value.trim(); 
+      });
+      Minna.LS.set('minna:cfg', c);
+      say('Đã lưu cài đặt.', 'ok');
+    };
+  }
 
-  function say(t, cls) { var m = $('msg'); m.textContent = t; m.className = 'msg ' + (cls || ''); }
+  function say(t, cls) { 
+    var m = $('msg'); 
+    if (!m) return;
+    m.textContent = t; 
+    m.className = 'msg ' + (cls || ''); 
+  }
 
   /* ---------- Compile ---------- */
   function compile(code) {
     var fake = { MINNA_LESSONS: {} };
-    try { new Function('window', code)(fake); }
-    catch (e) { throw new Error('Lỗi khi chạy code: ' + e.message); }
+    try { 
+      new Function('window', code)(fake); 
+    } catch (e) { 
+      throw new Error('Lỗi khi chạy code: ' + e.message); 
+    }
+
     var keys = Object.keys(fake.MINNA_LESSONS);
     if (!keys.length) throw new Error('Không thấy dòng window.MINNA_LESSONS[số bài] = {...}');
     if (keys.length > 1) throw new Error('Mỗi lần chỉ compile 1 bài (đang có ' + keys.length + ' bài).');
@@ -77,34 +90,74 @@
 
   $('download').onclick = function () {
     if (!current) return;
+    var blob = new Blob([current.text], { type: 'text/javascript;charset=utf-8' });
+    var url = URL.createObjectURL(blob);
     var a = document.createElement('a');
-    a.href = URL.createObjectURL(new Blob([current.text], { type: 'text/javascript' }));
+    a.href = url;
     a.download = 'bai-' + current.n + '.js';
     a.click();
+    setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
   };
 
-  /* ---------- Đăng lên GitHub ---------- */
-  function b64(s) { return btoa(unescape(encodeURIComponent(s))); }
+  /* ---------- Mã hóa Base64 hỗ trợ Unicode chuẩn ---------- */
+  function utf8ToBase64(str) {
+    var bytes = new TextEncoder().encode(str);
+    var binString = Array.from(bytes, function (b) { return String.fromCharCode(b); }).join('');
+    return btoa(binString);
+  }
 
+  /* ---------- Đăng lên GitHub ---------- */
   $('publish').onclick = async function () {
     if (!current) return;
     var c = Minna.LS.get('minna:cfg', {});
-    if (!c.owner || !c.repo || !c.token) { $('cfgBox').open = true; return say('Hãy nhập đủ owner / repo / token ở mục ① rồi bấm Lưu.', 'err'); }
+    if (!c.owner || !c.repo || !c.token) { 
+      $('cfgBox').open = true; 
+      return say('Hãy nhập đủ owner / repo / token ở mục ① rồi bấm Lưu.', 'err'); 
+    }
     var branch = c.branch || 'main';
     var path = 'data/lessons/bai-' + current.n + '.js';
     var api = 'https://api.github.com/repos/' + c.owner + '/' + c.repo + '/contents/' + path;
-    var h = { Authorization: 'Bearer ' + c.token, Accept: 'application/vnd.github+json' };
-    var btn = $('publish'); btn.disabled = true; say('Đang đăng lên GitHub...');
+    var h = { 
+      'Authorization': 'Bearer ' + c.token, 
+      'Accept': 'application/vnd.github+json' 
+    };
+    var btn = $('publish'); 
+    btn.disabled = true; 
+    say('Đang đăng lên GitHub...');
+    
     try {
-      var sha, r = await fetch(api + '?ref=' + encodeURIComponent(branch), { headers: h });
-      if (r.ok) sha = (await r.json()).sha;
-      else if (r.status !== 404) throw new Error('GitHub trả về ' + r.status + ' (kiểm tra token/repo/branch).');
-      var body = { message: 'Cập nhật đề flashcard Bài ' + current.n, content: b64(current.text), branch: branch };
+      var sha = null;
+      var r = await fetch(api + '?ref=' + encodeURIComponent(branch), { headers: h });
+      if (r.ok) {
+        var fileData = await r.json();
+        sha = fileData.sha;
+      } else if (r.status !== 404) {
+        var errJson = await r.json().catch(function () { return {}; });
+        throw new Error('GitHub trả về ' + r.status + ': ' + (errJson.message || 'Kiểm tra token/repo/branch'));
+      }
+
+      var body = { 
+        message: 'Cập nhật đề flashcard Bài ' + current.n, 
+        content: utf8ToBase64(current.text), 
+        branch: branch 
+      };
       if (sha) body.sha = sha;
-      var p = await fetch(api, { method: 'PUT', headers: Object.assign({ 'Content-Type': 'application/json' }, h), body: JSON.stringify(body) });
-      if (!p.ok) { var er = await p.json().catch(function () { return {}; }); throw new Error('Đăng thất bại (' + p.status + '): ' + (er.message || '')); }
+
+      var p = await fetch(api, { 
+        method: 'PUT', 
+        headers: Object.assign({ 'Content-Type': 'application/json' }, h), 
+        body: JSON.stringify(body) 
+      });
+
+      if (!p.ok) { 
+        var er = await p.json().catch(function () { return {}; }); 
+        throw new Error('Đăng thất bại (' + p.status + '): ' + (er.message || '')); 
+      }
       say('✔ Đã đăng Bài ' + current.n + '. GitHub Pages cần ~1 phút để cập nhật, sau đó học sinh sẽ thấy đề.', 'ok');
-    } catch (e) { say('✘ ' + e.message, 'err'); }
-    btn.disabled = false;
+    } catch (e) { 
+      say('✘ ' + e.message, 'err'); 
+    } finally {
+      btn.disabled = false;
+    }
   };
 })();
