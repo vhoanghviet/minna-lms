@@ -2,7 +2,7 @@
 (function () {
   var W = window;
   W.MINNA_LESSONS = W.MINNA_LESSONS || {};
-  var TOTAL = 25;
+  var TOTAL = 26;
 
   var LS = {
     get: function (k, d) { try { var v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch (e) { return d; } },
